@@ -1,0 +1,101 @@
+<html>
+<head>
+  <style>
+    .table th {
+      white-space: nowrap;
+    }
+
+    .item {
+      box-sizing: border-box;
+      position: relative;
+      width: 9%;
+      overflow: hidden;
+
+      display: inline-block;
+
+      background-size: cover;
+
+      margin: 0.25%;
+
+      color: green;
+    }
+
+    .item:before {
+      content: "";
+      display: block;
+      padding-top: 100%;
+    }
+
+    .item-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+
+    .item-count {
+      position: absolute;
+      top: 2;
+      right: 5;
+
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 col-md-offset-2 col-md-8" id="main">
+        <div class="page-header">
+          <h1>Material heatmap <small>generates an overview of what items are valuable in your account storage</small></h1>
+        </div>
+        <div id="errors">
+        </div>
+        <form id="apikey-form">
+          <div class="form-group">
+            <label for="APIToken">API Token (needs inventory permission)</label>
+            <input type="text" class="form-control" id="APIToken" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+
+          <button type="submit" class="btn btn-primary">Generate heatmap!</button>
+        </form>
+
+        <hr>
+
+        <div id="material-storage">
+
+        </div>
+      </h2>
+    </div>
+  </div>
+
+
+  <script type="text/javascript" src="bundle.js"></script>
+
+  <!-- bootstrap related files -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">-->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+  <script id="error-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <strong>Error: </strong> {{error}}
+    </div>
+  </script>
+
+  <script id="material-tab-template" type="text/x-handlebars-template">
+    {{#tabified}}
+      <h1> Section {{category}}</h1>
+      {{#items}}
+        <div class="item" style="background-image: url({{icon}});">
+          <div class="item-content" style="background-color: hsla({{color.h}},{{color.s}}%,{{color.l}}%,0.75);">
+              <span class="item-count"> {{count}} </span>
+          </div>
+        </div>
+      {{/items}}
+    {{/tabified}}
+  </script>
+</body>
+</html>
