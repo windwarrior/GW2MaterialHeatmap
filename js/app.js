@@ -15,106 +15,45 @@ $("#apikey-form").submit(function (event) {
 
   let token = $("#APIToken").val();
 
-  Promise.resolve(token).then(function (token) {
-    return token ? Promise.resolve(token) : Promise.reject(Error("You did not provide a token!"));
-  }).then(function (token) {
-    let token_info_url = `${constants.API_URL}${constants.TOKEN_INFO_URL}?access_token=${token}`;
-    return Promise.resolve($.get(token_info_url));
-  }).then(function (result) {
-    return "permissions" in result && result.permissions.includes("inventories") ? Promise.resolve(result) : Promise.reject(Error("The token you provided doesn't have inventories permission!"));
-  }).then(function (token_info) {
-    // Now we know that the token indeed has enough permissions
-    // we can call the appropriate api's for the materials
-    let account_materials_url = `${constants.API_URL}${constants.ACCOUNT_MATERIALS_URL}?access_token=${token}`;
-
-    return Promise.resolve($.get(account_materials_url));
-  }).then(function (material_storage) {
-    // We shall now chunk the data to get all item descriptions for these items
-    let buckets = [];
-
-    console.log(material_storage);
-
-    for (var i = 0; i < material_storage.length; i += 200) {
-      let index = Math.floor(i/200);
-
-      buckets[index] = material_storage.slice(i, i+200);
-    }
-
-    let promises = buckets.map(bucket => createItemTPPromise(bucket));
-    console.log(promises);
-
-    return Promise.all(promises);
-  }).then(function (buckets) {
-    // Flatten the array again because we don't need to do another API call
-    return [].concat.apply([], buckets);
-  }).then(function (buckets) {
-    buckets.forEach(x => {
-      console.log(x.name);
-
-      x["total_value_sells"] = "sells" in x ? x["sells"]["unit_price"] * x["count"] : 0;
-      x["total_value_buys"] = "buys" in x ? x["buys"]["unit_price"] * x["count"] : 0;
-    });
-
-    return buckets;
-  }).then (function (items) {
-    // Calculate the minimum and maximum values
-
-    let min_val = items.reduce(function (min, item) {
-      return "total_value_sells" in item && item["total_value_sells"] > 0 && min > item["total_value_sells"] ? item["total_value_sells"] : min;
-    }, Number.MAX_VALUE)
-
-    let max_val = items.reduce(function (max, item) {
-      return "total_value_sells" in item && item["total_value_sells"] > 0 && max < item["total_value_sells"] ? item["total_value_sells"] : max;
-    }, Number.MIN_VALUE)
-
-    console.log(`Max value was ${max_val}, min value was ${min_val}`);
-
-    items.forEach(item => {
-      let value = "total_value_sells" in item ? item["total_value_sells"] : 0;
-
-      if (value == 0) {
-        item["color"] = {
-          h: 0,
-          s: 0,
-          l: 50
-        }
-      } else {
-        let percentage = 1 - ((value - min_val) / (max_val - min_val));
-
-        item["color"] = {
-          h: percentage * 180,
-          s: 100,
-          l: 50
-        }
-      }
-
-      console.log(item);
-    });
-    return items;
-
+  createTokenValidatorPromise(token).then(function (token_info) {
+    return createAccountPromise(token_info);
   }).then(function (items) {
-    let tabified = items.reduce(function (buckets, item) {
-      let tab = buckets.find(x => x.category == item.category);
+    return createItemTransformPromise(items);
+  }).then(function (obj) {
+    let items = obj.items;
 
-      if (tab) {
-        tab.items.push(item);
+    $("#material-storage").append(createUI(obj));
+
+    updateAllColors(obj);
+
+    $(".item").dblclick(function (event) {
+      // we can now exclude this item from our visualisation
+
+      let item = obj.items.find(x => x.id == $(this).data("id"));
+      let min = obj.min_value;
+      let max = obj.max_value;
+
+      console.log(`${min} <= ${item.total_value_sells} <= ${max}`);
+
+
+      item.disabled = !item.disabled;
+
+      if (item.total_value_sells > 0 && item.total_value_sells <= min) {
+        console.log("Dat was de goedkoopste :'(");
+        updateAllColors(obj);
+      } else if(item.total_value_sells >= max) {
+        console.log("Dat was de duurste :'(");
+        updateAllColors(obj);
       } else {
-        buckets.push({category: item.category, items: [item]});
+        // We can simply update this single item, is a bit less harsh on this device
+        $("#item-"+item.id+" .item-content").css({'background-color': 'hsla(0, 0%, 50%, 0.75)'});
       }
 
-      return buckets;
-    }, []);
 
-
-    var source = $("#material-tab-template").html();
-    var template = Handlebars.compile(source);
-
-    var context = {tabified: tabified};
-
-    var html = template(context);
-
-    $("#material-storage").append(html);
+    });
   }).catch(function (error) {
+    console.log(error);
+
     var source = $("#error-template").html();
     var template = Handlebars.compile(source);
 
@@ -126,6 +65,22 @@ $("#apikey-form").submit(function (event) {
   })
 });
 
+/* Creates a promise that will check everything related to the token
+
+@param token: The token that should be checked
+*/
+function createTokenValidatorPromise(token) {
+  return Promise.resolve(token).then(function (token) {
+    return token ? Promise.resolve(token) : Promise.reject(Error("You did not provide a token!"));
+  }).then(function (token) {
+    let token_info_url = `${constants.API_URL}${constants.TOKEN_INFO_URL}?access_token=${token}`;
+    return Promise.resolve($.get(token_info_url));
+  }).then(function (result) {
+    return "permissions" in result && result.permissions.includes("inventories") ? Promise.resolve(result) : Promise.reject(Error("The token you provided doesn't have inventories permission!"));
+  }).then(function (result) {
+    return $.extend(result, {'token': token});
+  });
+}
 
 function createItemTPPromise(items) {
   let ids = items.map(elem => elem.id).join(",");
@@ -144,4 +99,126 @@ function createItemTPPromise(items) {
 
     return items;
   });
+}
+
+function createAccountPromise(token_info) {
+  return Promise.resolve(token_info).then(function (token_info) {
+    // Now we know that the token indeed has enough permissions
+    // we can call the appropriate api's for the materials
+    let account_materials_url = `${constants.API_URL}${constants.ACCOUNT_MATERIALS_URL}?access_token=${token_info.token}`;
+
+    return Promise.resolve($.get(account_materials_url));
+  }).then(function (material_storage) {
+    // We shall now chunk the data to get all item descriptions for these items
+    let buckets = [];
+
+    for (var i = 0; i < material_storage.length; i += 200) {
+      let index = Math.floor(i/200);
+
+      buckets[index] = material_storage.slice(i, i+200);
+    }
+
+    let promises = buckets.map(bucket => createItemTPPromise(bucket));
+
+    return Promise.all(promises);
+  }).then(function (buckets) {
+    // Flatten the array again because we don't need to do another API call
+    return [].concat.apply([], buckets);
+  })
+}
+
+function createItemTransformPromise(items) {
+  return Promise.resolve(items).then(function (items) {
+    items.forEach(x => {
+      x["disabled"] = false;
+
+      x["total_value_sells"] = "sells" in x ? x["sells"]["unit_price"] * x["count"] : 0;
+      x["total_value_buys"] = "buys" in x ? x["buys"]["unit_price"] * x["count"] : 0;
+    });
+
+    return items;
+  }).then (function (items) {
+    let min_val = items.reduce(function (min, item) {
+      return "total_value_sells" in item && item["total_value_sells"] > 0 && min > item["total_value_sells"] ? item["total_value_sells"] : min;
+    }, Number.MAX_VALUE)
+
+    let max_val = items.reduce(function (max, item) {
+      return "total_value_sells" in item && item["total_value_sells"] > 0 && max < item["total_value_sells"] ? item["total_value_sells"] : max;
+    }, Number.MIN_VALUE)
+
+    return {
+      "min_value": min_val,
+      "max_value": max_val,
+      "items": items
+    }
+  });
+}
+
+function createUI(obj) {
+  let tabified = obj.items.reduce(function (buckets, item) {
+    let tab = buckets.find(x => x.category == item.category);
+
+    if (tab) {
+      tab.items.push(item);
+    } else {
+      buckets.push({category: item.category, items: [item]});
+    }
+
+    return buckets;
+  }, []);
+
+  var source = $("#material-tab-template").html();
+  var template = Handlebars.compile(source);
+
+  var context = {tabified: tabified};
+
+  var html = template(context);
+
+  return html;
+}
+
+function updateAllColors(obj) {
+  // firstly we need to determine new min and max values
+  let min_val = obj.items.reduce(function (min, item) {
+    return !item.disabled && "total_value_sells" in item && item["total_value_sells"] > 0 && min > item["total_value_sells"] ? item["total_value_sells"] : min;
+  }, Number.MAX_VALUE);
+
+  let max_val = obj.items.reduce(function (max, item) {
+    return !item.disabled && "total_value_sells" in item && item["total_value_sells"] > 0 && max < item["total_value_sells"] ? item["total_value_sells"] : max;
+  }, Number.MIN_VALUE);
+
+  obj.min_value = min_val;
+  obj.max_value = max_val;
+
+  obj.items.forEach(function (item) {
+    let value = "total_value_sells" in item ? item["total_value_sells"] : 0;
+
+    if (item.disabled) {
+      item["color"] = {
+        h: 0,
+        s: 0,
+        l: 25
+      }
+    } else if (value == 0 || ("disabled" in item && item.disabled)) {
+      item["color"] = {
+        h: 0,
+        s: 0,
+        l: 50
+      }
+    } else {
+      let percentage = 1 - ((value - min_val) / (max_val - min_val));
+
+      item["color"] = {
+        h: percentage * 180,
+        s: 100,
+        l: 50
+      }
+    }
+
+    console.log("updating color!");
+    console.log(`hsla(${item.color.h}, ${item.color.s}%, ${item.color.l}%, 0.75)`);
+
+    $("#item-"+item.id+" .item-content").css({'background-color': `hsla(${item.color.h}, ${item.color.s}%, ${item.color.l}%, 0.75)`});
+  });
+
 }
