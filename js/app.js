@@ -3,7 +3,7 @@ require('./jquery_promise');
 require("babelify-es6-polyfill");
 
 var constants = require("./constants");
-var Handlebars = require('Handlebars');
+var Handlebars = require('handlebars');
 
 $("#apikey-form").submit(function (event) {
   // lets not post this request
