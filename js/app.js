@@ -5,9 +5,35 @@ require("babelify-es6-polyfill");
 var constants = require("./constants");
 var Handlebars = require('handlebars');
 
+var storage = [];
+
 $(function() {
-  // Page ready
-  updateStatus("Ready!");
+  updateStatus("Creating Base...");
+  createMaterialsPromise().then(function(matresult) {
+    let item_ids = matresult.reduce(function(a,b) {
+      return a.concat(b.items);
+    }, []);
+    return createItemTPPromise(item_ids).then(function(results) {
+      return createItemTransformPromise(results);
+    }).then(function(obj) {
+      matresult.forEach(category => {
+        category.items = category.items.map(itemid => {
+          return obj.items.find(x => itemid == x.id);
+        });
+      });
+      let result = [];
+      result = obj;
+      result["categories"] = matresult;
+      return result;
+    });
+    
+  }).then(function(result) {
+    createUI(result["categories"]);
+    storage = result;
+    console.log(storage);
+    updateStatus("Ready!");
+  });
+  
 });
 
 $("#apikey-form").submit(function (event) {
@@ -24,19 +50,14 @@ $("#apikey-form").submit(function (event) {
   createTokenValidatorPromise(token).then(function (token_info) {
     updateStatus("Creating Account Promise...");
     return createAccountPromise(token_info);
-  }).then(function (items) {
-    updateStatus("Creating Item Transform Promise...");
-    return createItemTransformPromise(items);
+  }).then(function (result) {
+    return createItemTransformPromise(result["items"]);
   }).then(function (obj) {
-    let items = obj.items;
-    updateStatus("Creating UI...");
-    $("#material-storage").html(createUI(obj));
-
+    console.log(obj);
     updateAllColors(obj);
 
     $(".item").dblclick(function (event) {
       // we can now exclude this item from our visualisation
-
       let item = obj.items.find(x => x.id == $(this).data("id"));
       let min = obj.min_value;
       let max = obj.max_value;
@@ -53,15 +74,6 @@ $("#apikey-form").submit(function (event) {
       }
 
     });
-  }).catch(function (error) {
-    var source = $("#error-template").html();
-    var template = Handlebars.compile(source);
-
-    var context = {error: error.message}
-
-    var html = template(context);
-
-    $("#errors").append(html);
   })
 });
 
@@ -69,6 +81,11 @@ function updateStatus(status) {
   $("#status").html(status);
 }
 
+// fetches https://api.guildwars2.com/v2/materials?ids=all
+function createMaterialsPromise() {
+  let materials_info_url = `${constants.API_URL}${constants.MATERIALS_INFO_URL}`;
+  return Promise.resolve($.get(materials_info_url));
+}
 
 /* Creates a promise that will check everything related to the token
 
@@ -87,22 +104,44 @@ function createTokenValidatorPromise(token) {
   });
 }
 
-function createItemTPPromise(items) {
-  let ids = items.map(elem => elem.id).join(",");
-
-  let item_url = `${constants.API_URL}${constants.ITEMS_URL}?ids=${ids}`;
-  let price_url = `${constants.API_URL}${constants.COMMERCE_PRICES_URL}?ids=${ids}`;
-
-  return Promise.all([$.ajax(item_url), $.ajax(price_url)]).then(function (results) {
-    results.forEach(function (feature_items) {
-      feature_items.forEach(function (feature_item) {
-        let item = items.find(current_item => feature_item.id == current_item.id);
-
-        $.extend(item, feature_item);
-      })
-    });
-
-    return items;
+function createItemTPPromise(item_ids) {
+  return Promise.resolve(item_ids).then(function(item_ids) {
+    // We shall now chunk the data to get all item descriptions for these items
+    let buckets = [];
+  
+    for (var i = 0; i < item_ids.length; i += 200) {
+      let index = Math.floor(i/200);
+  
+      buckets[index] = item_ids.slice(i, i+200);
+    }
+  
+    return Promise.all(buckets.map(bucket => {
+      let ids = bucket;
+  
+      let item_url = `${constants.API_URL}${constants.ITEMS_URL}?ids=${ids}`;
+      let price_url = `${constants.API_URL}${constants.COMMERCE_PRICES_URL}?ids=${ids}`;
+      
+      let resultbucket = [];
+    
+      return Promise.all([$.ajax(item_url), $.ajax(price_url)]).then(function (results) {
+        results.forEach(function (feature_items) {
+          feature_items.forEach(function (feature_item) {
+            let item = resultbucket.find(current_item => feature_item.id == current_item.id);
+            feature_item["count"] = 0;
+            if(item) {
+              $.extend(item, feature_item);
+            }
+            else {
+              resultbucket.push(feature_item);
+            }
+          });
+        });
+    
+        return resultbucket;
+      });
+    }));
+  }).then(function(result){
+    return [].concat.apply([], result);
   });
 }
 
@@ -114,22 +153,13 @@ function createAccountPromise(token_info) {
 
     return Promise.resolve($.get(account_materials_url));
   }).then(function (material_storage) {
-    // We shall now chunk the data to get all item descriptions for these items
-    let buckets = [];
-
-    for (var i = 0; i < material_storage.length; i += 200) {
-      let index = Math.floor(i/200);
-
-      buckets[index] = material_storage.slice(i, i+200);
-    }
-
-    let promises = buckets.map(bucket => createItemTPPromise(bucket));
-
-    return Promise.all(promises);
-  }).then(function (buckets) {
-    // Flatten the array again because we don't need to do another API call
-    return [].concat.apply([], buckets);
-  })
+    material_storage.forEach(item => {
+      let store_item = storage.items.find(x => x.id == item.id);
+      $("#item-"+item.id).find(".item-count").html(item.count);
+      store_item["count"] = item.count;
+    });
+    return storage;
+  });
 }
 
 function createItemTransformPromise(items) {
@@ -150,28 +180,17 @@ function createItemTransformPromise(items) {
     let max_val = items.reduce(function (max, item) {
       return "total_value_sells" in item && item["total_value_sells"] > 0 && max < item["total_value_sells"] ? item["total_value_sells"] : max;
     }, Number.MIN_VALUE)
-
-    return {
-      "min_value": min_val,
-      "max_value": max_val,
-      "items": items
-    }
+    
+    storage["min_value"] = min_val;
+    storage["max_value"] = max_val;
+    storage["items"] = items;
+    return storage;
   });
 }
 
 function createUI(obj) {
-  let tabified = obj.items.reduce(function (buckets, item) {
-    let tab = buckets.find(x => x.category == item.category);
-
-    if (tab) {
-      tab.items.push(item);
-    } else {
-      buckets.push({category: item.category, items: [item]});
-    }
-
-    return buckets;
-  }, []);
-
+  let tabified = obj;
+  
   var source = $("#material-tab-template").html();
   var template = Handlebars.compile(source);
 
@@ -179,11 +198,12 @@ function createUI(obj) {
 
   var html = template(context);
 
-  return html;
+  $("#material-storage").html(html);
 }
 
 function updateAllColors(obj) {
   updateStatus("Updating Colors...");
+
   
   // firstly we need to determine new min and max values
   let min_val = obj.items.reduce(function (min, item) {
