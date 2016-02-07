@@ -1,6 +1,7 @@
 window.$ = window.jQuery = require('jquery');
 require('./jquery_promise');
 require("babelify-es6-polyfill");
+require("./array_includes_polyfill");
 
 var constants = require("./constants");
 var Handlebars = require('handlebars');
@@ -274,6 +275,7 @@ function createUI(obj) {
   $('[data-toggle="popover"]').popover({
     html: true,
     placement: 'auto',
+    container: 'body',
     content: function () {
       return createPopover(storage.items.find(x => x.id == $(this).data("id")));
     }

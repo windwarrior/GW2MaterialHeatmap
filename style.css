@@ -62,8 +62,15 @@
 #optionsfield, #infofield, #helpfield {
   border-left: 2px solid #666;
 }
+#optionsfield {
+    min-width: 200px;
+}
+#infofield {
+  display: none;
+  min-width: 125px;
+}
 
-#infofield, #helpfield {
+#helpfield { 
   display: none;
 }
 
@@ -79,8 +86,17 @@
     border-bottom: 1px solid #eee;
     padding-bottom: 20px;
 }
+
+#menu>div {
+    padding-top: 5px;
+    padding-bottom:5px;
+}
 @media (min-width: 991px) {
     #menu>div {
         height: 130px;
     }
+}
+
+.row{
+  overflow: hidden;
 }
