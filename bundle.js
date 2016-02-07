@@ -8,6 +8,11 @@ require("babelify-es6-polyfill");
 var constants = require("./constants");
 var Handlebars = require('handlebars');
 
+$(function () {
+  // Page ready
+  updateStatus("Ready!");
+});
+
 $("#apikey-form").submit(function (event) {
   // lets not post this request
   event.preventDefault();
@@ -15,16 +20,20 @@ $("#apikey-form").submit(function (event) {
   // Lets also clear all previous errors
   $("#errors").empty();
 
+  updateStatus("Creating Token...");
+
   var token = $("#APIToken").val();
 
   createTokenValidatorPromise(token).then(function (token_info) {
+    updateStatus("Creating Account Promise...");
     return createAccountPromise(token_info);
   }).then(function (items) {
+    updateStatus("Creating Item Transform Promise...");
     return createItemTransformPromise(items);
   }).then(function (obj) {
     var items = obj.items;
-
-    $("#material-storage").append(createUI(obj));
+    updateStatus("Creating UI...");
+    $("#material-storage").html(createUI(obj));
 
     updateAllColors(obj);
 
@@ -67,6 +76,10 @@ $("#apikey-form").submit(function (event) {
     $("#errors").append(html);
   });
 });
+
+function updateStatus(status) {
+  $("#status").html(status);
+}
 
 /* Creates a promise that will check everything related to the token
 
@@ -189,6 +202,8 @@ function createUI(obj) {
 }
 
 function updateAllColors(obj) {
+  updateStatus("Updating Colors...");
+
   // firstly we need to determine new min and max values
   var min_val = obj.items.reduce(function (min, item) {
     return !item.disabled && "total_value_sells" in item && item["total_value_sells"] > 0 && min > item["total_value_sells"] ? item["total_value_sells"] : min;
@@ -231,6 +246,8 @@ function updateAllColors(obj) {
 
     $("#item-" + item.id + " .item-content").css({ 'background-color': 'hsla(' + item.color.h + ', ' + item.color.s + '%, ' + item.color.l + '%, 0.75)' });
   });
+
+  updateStatus("Done!");
 }
 
 },{"./constants":2,"./jquery_promise":3,"babelify-es6-polyfill":161,"handlebars":195,"jquery":208}],2:[function(require,module,exports){
