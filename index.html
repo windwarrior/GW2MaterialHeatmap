@@ -54,6 +54,15 @@
          1px 1px 0 white;
     }
 
+    .icon-compact {
+      width: 16px;
+      height: 16px;
+    }
+    
+    .moneyBox {
+      min-width: fit-content;
+      white-space: nowrap;
+    }
     /*
     #legenda #colors {
       height: 16px;
@@ -127,12 +136,8 @@
   </script>
 
   <script id="popover-detail-template" type="text/x-handlebars-template">
-    <dl>
-      <dt>TP buy:</dt>
-      <dd>{{formatSimpleGold item.total_value_buys}}</dd>
-      <dt>TP sell:</dt>
-      <dd>{{formatSimpleGold item.total_value_sells}}</dd>
-    </dl>
+    <b>TP buy:</b> {{formatGold item.total_value_buys}}
+    <b>TP sell:</b> {{formatGold item.total_value_sells}}
   </script>
 </body>
 </html>

@@ -6,6 +6,7 @@ var constants = require("./constants");
 var Handlebars = require('handlebars');
 
 var storage = {};
+var icons = {};
 
 $(function() {
   updateStatus("Creating Base...");
@@ -30,6 +31,18 @@ $(function() {
     });
 
   }).then(function(result) {
+    
+    Promise.resolve($.ajax("https://api.guildwars2.com/v1/files.json")).then(function (fileJson) {
+      for (let icon_name of ["ui_coin_gold", "ui_coin_silver", "ui_coin_copper"]) {
+        let signature = fileJson[icon_name]["signature"];
+        let file_id = fileJson[icon_name]["file_id"];
+  
+        let gold_icon_location = `https://render.guildwars2.com/file/${signature}/${file_id}.png`;
+        icons[icon_name] = `<img class="icon-compact" src="${gold_icon_location}"/>`;
+      }
+    });
+    
+    
     createUI(result["categories"]);
     storage = result;
     console.log(storage);
@@ -63,13 +76,6 @@ $("#apikey-form").submit(function (event) {
     console.log(obj);
     updateAllColors(obj);
 
-    $('[data-toggle="popover"]').popover({
-      html: true,
-      content: function () {
-        return createPopover(obj.items.find(x => x.id == $(this).data("id")));
-      }
-    })
-
     $(".item").dblclick(function (event) {
       // we can now exclude this item from our visualisation
       let item = obj.items.find(x => x.id == $(this).data("id"));
@@ -88,7 +94,7 @@ $("#apikey-form").submit(function (event) {
       }
 
     });
-  })
+  });
 });
 
 function updateStatus(status) {
@@ -230,6 +236,14 @@ function createUI(obj) {
   var html = template(context);
 
   $("#material-storage").html(html);
+  
+  $('[data-toggle="popover"]').popover({
+      html: true,
+      placement: 'auto',
+      content: function () {
+        return createPopover(storage.items.find(x => x.id == $(this).data("id")));
+      }
+    });
 }
 
 function updateAllColors(obj) {
@@ -282,21 +296,21 @@ function updateSingleColor(item, min_val, max_val) {
   $("#item-"+item.id+" .item-content").css({'background-color': `hsla(${item.color.h}, ${item.color.s}%, ${item.color.l}%, 0.75)`});
 }
 
-Handlebars.registerHelper("formatSimpleGold", function(coin, icons) {
+Handlebars.registerHelper("formatGold", function(coin) {
   coin = Math.round(coin);
   var gold   = Math.floor(coin / 10000) % 100;
   var silver = Math.floor(coin / 100) % 100;
   var copper = Math.floor(coin) % 100;
 
-  let res = copper + 'c';
+  let res = `<span>${copper}</span>` + icons.ui_coin_copper;
 
   if (silver > 0) {
-    res = silver + 's' + res;
+    res = `<span>${silver}</span>` + icons.ui_coin_silver + res;
   }
 
   if (gold > 0) {
-    res = gold + 'g' + res;
+    res = `<span>${gold}</span>` + icons.ui_coin_gold + res;
   }
 
-  return new Handlebars.SafeString(res);
+  return new Handlebars.SafeString('<div class="moneyBox">' + res + '</div>');
 });

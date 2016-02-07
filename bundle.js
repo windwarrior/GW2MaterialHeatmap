@@ -9,6 +9,7 @@ var constants = require("./constants");
 var Handlebars = require('handlebars');
 
 var storage = {};
+var icons = {};
 
 $(function () {
   updateStatus("Creating Base...");
@@ -34,6 +35,20 @@ $(function () {
       return result;
     });
   }).then(function (result) {
+
+    Promise.resolve($.ajax("https://api.guildwars2.com/v1/files.json")).then(function (fileJson) {
+      var _arr = ["ui_coin_gold", "ui_coin_silver", "ui_coin_copper"];
+
+      for (var _i = 0; _i < _arr.length; _i++) {
+        var icon_name = _arr[_i];
+        var signature = fileJson[icon_name]["signature"];
+        var file_id = fileJson[icon_name]["file_id"];
+
+        var gold_icon_location = 'https://render.guildwars2.com/file/' + signature + '/' + file_id + '.png';
+        icons[icon_name] = '<img class="icon-compact" src="' + gold_icon_location + '"/>';
+      }
+    });
+
     createUI(result["categories"]);
     storage = result;
     console.log(storage);
@@ -67,23 +82,12 @@ $("#apikey-form").submit(function (event) {
     console.log(obj);
     updateAllColors(obj);
 
-    $('[data-toggle="popover"]').popover({
-      html: true,
-      content: function content() {
-        var _this = this;
-
-        return createPopover(obj.items.find(function (x) {
-          return x.id == $(_this).data("id");
-        }));
-      }
-    });
-
     $(".item").dblclick(function (event) {
-      var _this2 = this;
+      var _this = this;
 
       // we can now exclude this item from our visualisation
       var item = obj.items.find(function (x) {
-        return x.id == $(_this2).data("id");
+        return x.id == $(_this).data("id");
       });
       var min = obj.min_value;
       var max = obj.max_value;
@@ -244,6 +248,18 @@ function createUI(obj) {
   var html = template(context);
 
   $("#material-storage").html(html);
+
+  $('[data-toggle="popover"]').popover({
+    html: true,
+    placement: 'auto',
+    content: function content() {
+      var _this2 = this;
+
+      return createPopover(storage.items.find(function (x) {
+        return x.id == $(_this2).data("id");
+      }));
+    }
+  });
 }
 
 function updateAllColors(obj) {
@@ -296,23 +312,23 @@ function updateSingleColor(item, min_val, max_val) {
   $("#item-" + item.id + " .item-content").css({ 'background-color': 'hsla(' + item.color.h + ', ' + item.color.s + '%, ' + item.color.l + '%, 0.75)' });
 }
 
-Handlebars.registerHelper("formatSimpleGold", function (coin, icons) {
+Handlebars.registerHelper("formatGold", function (coin) {
   coin = Math.round(coin);
   var gold = Math.floor(coin / 10000) % 100;
   var silver = Math.floor(coin / 100) % 100;
   var copper = Math.floor(coin) % 100;
 
-  var res = copper + 'c';
+  var res = '<span>' + copper + '</span>' + icons.ui_coin_copper;
 
   if (silver > 0) {
-    res = silver + 's' + res;
+    res = '<span>' + silver + '</span>' + icons.ui_coin_silver + res;
   }
 
   if (gold > 0) {
-    res = gold + 'g' + res;
+    res = '<span>' + gold + '</span>' + icons.ui_coin_gold + res;
   }
 
-  return new Handlebars.SafeString(res);
+  return new Handlebars.SafeString('<div class="moneyBox">' + res + '</div>');
 });
 
 },{"./constants":2,"./jquery_promise":3,"babelify-es6-polyfill":161,"handlebars":195,"jquery":208}],2:[function(require,module,exports){
@@ -12419,7 +12435,7 @@ function amdefine(module, requireFn) {
 
 module.exports = amdefine;
 
-}).call(this,require('_process'),"/..\\..\\..\\node_modules\\handlebars\\node_modules\\source-map\\node_modules\\amdefine\\amdefine.js")
+}).call(this,require('_process'),"/node_modules/handlebars/node_modules/source-map/node_modules/amdefine/amdefine.js")
 },{"_process":165,"path":164}],208:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.0
