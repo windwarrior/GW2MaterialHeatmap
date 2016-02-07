@@ -22255,6 +22255,7 @@ Handlebars.registerHelper("formatGold", function (coin) {
 },{"./array_includes_polyfill":207,"./constants":208,"./jquery_promise":209,"babelify-es6-polyfill":159,"handlebars":191,"jquery":192}],207:[function(require,module,exports){
 'use strict';
 
+// Polyfill from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes
 if (!Array.prototype.includes) {
   Array.prototype.includes = function (searchElement /*, fromIndex*/) {
     'use strict';
