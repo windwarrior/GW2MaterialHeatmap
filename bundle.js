@@ -36,6 +36,14 @@ $(function () {
     storage = result;
     console.log(storage);
     updateStatus("Ready!");
+
+    if (localStorage.getItem("API token")) {
+      $("#APIToken").val(localStorage.getItem("API token"));
+
+      $("#token-localstore-info").show();
+    } else {
+      $("#token-localstore-info").hide();
+    }
   });
 });
 
@@ -59,6 +67,8 @@ $("#apikey-form").submit(function (event) {
     console.log(obj);
     updateAllColors(obj);
 
+    $('[data-toggle="popover"]').popover();
+
     $(".item").dblclick(function (event) {
       var _this = this;
 
@@ -77,7 +87,7 @@ $("#apikey-form").submit(function (event) {
         updateAllColors(obj);
       } else {
         // We can simply update this single item, is a bit less harsh on this device
-        $("#item-" + item.id + " .item-content").css({ 'background-color': 'hsla(0, 0%, 50%, 0.75)' });
+        updateSingleColor(item, obj.min_value, obj.max_value);
       }
     });
   });
@@ -105,6 +115,12 @@ function createTokenValidatorPromise(token) {
     return Promise.resolve($.get(token_info_url));
   }).then(function (result) {
     return "permissions" in result && result.permissions.includes("inventories") ? Promise.resolve(result) : Promise.reject(Error("The token you provided doesn't have inventories permission!"));
+  }).then(function (result) {
+    // Set this valid token in the localStorage
+    localStorage.setItem("API token", token);
+    $("#token-localstore-info").show();
+
+    return result;
   }).then(function (result) {
     return $.extend(result, { 'token': token });
   });
@@ -226,34 +242,38 @@ function updateAllColors(obj) {
   obj.max_value = max_val;
 
   obj.items.forEach(function (item) {
-    var value = "total_value_sells" in item ? item["total_value_sells"] : 0;
-
-    if (item.disabled) {
-      item["color"] = {
-        h: 0,
-        s: 0,
-        l: 25
-      };
-    } else if (value == 0 || "disabled" in item && item.disabled) {
-      item["color"] = {
-        h: 0,
-        s: 0,
-        l: 50
-      };
-    } else {
-      var percentage = 1 - (value - min_val) / (max_val - min_val);
-
-      item["color"] = {
-        h: percentage * 180,
-        s: 100,
-        l: 50
-      };
-    }
-
-    $("#item-" + item.id + " .item-content").css({ 'background-color': 'hsla(' + item.color.h + ', ' + item.color.s + '%, ' + item.color.l + '%, 0.75)' });
+    updateSingleColor(item, min_val, max_val);
   });
 
   updateStatus("Done!");
+}
+
+function updateSingleColor(item, min_val, max_val) {
+  var value = "total_value_sells" in item ? item["total_value_sells"] : 0;
+
+  if (item.disabled) {
+    item["color"] = {
+      h: 0,
+      s: 0,
+      l: 25
+    };
+  } else if (value == 0 || "disabled" in item && item.disabled) {
+    item["color"] = {
+      h: 0,
+      s: 100,
+      l: 100
+    };
+  } else {
+    var percentage = 1 - (value - min_val) / (max_val - min_val);
+
+    item["color"] = {
+      h: percentage * 180,
+      s: 100,
+      l: 50
+    };
+  }
+
+  $("#item-" + item.id + " .item-content").css({ 'background-color': 'hsla(' + item.color.h + ', ' + item.color.s + '%, ' + item.color.l + '%, 0.75)' });
 }
 
 Handlebars.registerHelper("formatSimpleGold", function (coin, icons) {
