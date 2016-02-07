@@ -13,6 +13,10 @@ $(function() {
   updateStatus("Creating Base...");
 
   $("#token-localstore-info").hide();
+  
+  $("#APIToken").keyup(function () {
+    $(this).val($.trim($(this).val()));
+  });
 
   createMaterialsPromise().then(function(matresult) {
     let item_ids = matresult.reduce(function(a,b) {
@@ -88,6 +92,7 @@ $("#apikey-form").submit(function (event) {
     var context = { error: error.message };
     var html = template(context);
     $("#errors").append(html);
+    updateStatus("Error!");
   });
 });
 
@@ -115,7 +120,7 @@ function createTokenValidatorPromise(token) {
     return "permissions" in result && result.permissions.includes("inventories") ? Promise.resolve(result) : Promise.reject(Error("The token you provided doesn't have inventories permission!"));
   }).then(function (result) {
     // Set this valid token in the localStorage
-    localStorage.setItem("API token", token);
+    localStorage.setItem("API token", $.trim(token));
     $("#token-localstore-info").show();
 
     return result;
@@ -193,8 +198,10 @@ function updateInfo() {
   }, 0);
   var context = {total_buy: total_buy, total_sell: total_sell};
   var html = template(context);
-  console.log(html);
+
   $('#infofield').html(html);
+  $('#infofield').show();
+  $('#helpfield').show();
 }
 
 function createItemTransformPromise(items) {
