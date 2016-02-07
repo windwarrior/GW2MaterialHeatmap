@@ -9,6 +9,9 @@ var storage = [];
 
 $(function() {
   updateStatus("Creating Base...");
+
+  $("#token-localstore-info").hide();
+
   createMaterialsPromise().then(function(matresult) {
     let item_ids = matresult.reduce(function(a,b) {
       return a.concat(b.items);
@@ -26,20 +29,18 @@ $(function() {
       result["categories"] = matresult;
       return result;
     });
-    
+
   }).then(function(result) {
     createUI(result["categories"]);
     storage = result;
     console.log(storage);
     updateStatus("Ready!");
-    
-    if (localStorage.getItem("API token")) {
-    $("#APIToken").val(localStorage.getItem("API token"));
 
-    $("#token-localstore-info").show();
-  } else {
-    $("#token-localstore-info").hide();
-  }
+    if (localStorage.getItem("API token")) {
+      $("#APIToken").val(localStorage.getItem("API token"));
+
+      $("#token-localstore-info").show();
+    }
   });
 });
 
@@ -123,21 +124,21 @@ function createItemTPPromise(item_ids) {
   return Promise.resolve(item_ids).then(function(item_ids) {
     // We shall now chunk the data to get all item descriptions for these items
     let buckets = [];
-  
+
     for (var i = 0; i < item_ids.length; i += 200) {
       let index = Math.floor(i/200);
-  
+
       buckets[index] = item_ids.slice(i, i+200);
     }
-  
+
     return Promise.all(buckets.map(bucket => {
       let ids = bucket;
-  
+
       let item_url = `${constants.API_URL}${constants.ITEMS_URL}?ids=${ids}`;
       let price_url = `${constants.API_URL}${constants.COMMERCE_PRICES_URL}?ids=${ids}`;
-      
+
       let resultbucket = [];
-    
+
       return Promise.all([$.ajax(item_url), $.ajax(price_url)]).then(function (results) {
         results.forEach(function (feature_items) {
           feature_items.forEach(function (feature_item) {
@@ -151,7 +152,7 @@ function createItemTPPromise(item_ids) {
             }
           });
         });
-    
+
         return resultbucket;
       });
     }));
@@ -195,7 +196,7 @@ function createItemTransformPromise(items) {
     let max_val = items.reduce(function (max, item) {
       return "total_value_sells" in item && item["total_value_sells"] > 0 && max < item["total_value_sells"] ? item["total_value_sells"] : max;
     }, Number.MIN_VALUE)
-    
+
     storage["min_value"] = min_val;
     storage["max_value"] = max_val;
     storage["items"] = items;
@@ -205,7 +206,7 @@ function createItemTransformPromise(items) {
 
 function createUI(obj) {
   let tabified = obj;
-  
+
   var source = $("#material-tab-template").html();
   var template = Handlebars.compile(source);
 
