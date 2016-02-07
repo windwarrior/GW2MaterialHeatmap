@@ -49,7 +49,7 @@ $("#apikey-form").submit(function (event) {
         updateAllColors(obj);
       } else {
         // We can simply update this single item, is a bit less harsh on this device
-        $("#item-"+item.id+" .item-content").css({'background-color': 'hsla(0, 0%, 50%, 0.75)'});
+        updateSingleColor(item, obj.min_value, obj.max_value);
       }
 
     });
@@ -198,34 +198,38 @@ function updateAllColors(obj) {
   obj.max_value = max_val;
 
   obj.items.forEach(function (item) {
-    let value = "total_value_sells" in item ? item["total_value_sells"] : 0;
-
-    if (item.disabled) {
-      item["color"] = {
-        h: 0,
-        s: 0,
-        l: 25
-      }
-    } else if (value == 0 || ("disabled" in item && item.disabled)) {
-      item["color"] = {
-        h: 0,
-        s: 100,
-        l: 100
-      }
-    } else {
-      let percentage = 1 - ((value - min_val) / (max_val - min_val));
-
-      item["color"] = {
-        h: percentage * 180,
-        s: 100,
-        l: 50
-      }
-    }
-
-    $("#item-"+item.id+" .item-content").css({'background-color': `hsla(${item.color.h}, ${item.color.s}%, ${item.color.l}%, 0.75)`});
+    updateSingleColor(item, min_val, max_val);
   });
 
   updateStatus("Done!");
+}
+
+function updateSingleColor(item, min_val, max_val) {
+  let value = "total_value_sells" in item ? item["total_value_sells"] : 0;
+
+  if (item.disabled) {
+    item["color"] = {
+      h: 0,
+      s: 0,
+      l: 25
+    }
+  } else if (value == 0 || ("disabled" in item && item.disabled)) {
+    item["color"] = {
+      h: 0,
+      s: 100,
+      l: 100
+    }
+  } else {
+    let percentage = 1 - ((value - min_val) / (max_val - min_val));
+
+    item["color"] = {
+      h: percentage * 180,
+      s: 100,
+      l: 50
+    }
+  }
+
+  $("#item-"+item.id+" .item-content").css({'background-color': `hsla(${item.color.h}, ${item.color.s}%, ${item.color.l}%, 0.75)`});
 }
 
 Handlebars.registerHelper("formatSimpleGold", function(coin, icons) {
