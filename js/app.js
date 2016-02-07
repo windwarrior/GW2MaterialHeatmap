@@ -1,6 +1,7 @@
 window.$ = window.jQuery = require('jquery');
 require('./jquery_promise');
 require("babelify-es6-polyfill");
+require("./array_includes_polyfill");
 
 var constants = require("./constants");
 var Handlebars = require('handlebars');

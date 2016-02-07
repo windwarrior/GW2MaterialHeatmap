@@ -21890,6 +21890,7 @@ define(function (require, exports, module) {
 window.$ = window.jQuery = require('jquery');
 require('./jquery_promise');
 require("babelify-es6-polyfill");
+require("./array_includes_polyfill");
 
 var constants = require("./constants");
 var Handlebars = require('handlebars');
@@ -22244,7 +22245,42 @@ Handlebars.registerHelper("formatGold", function (coin) {
   return new Handlebars.SafeString('<div class="moneyBox">' + res + '</div>');
 });
 
-},{"./constants":207,"./jquery_promise":208,"babelify-es6-polyfill":159,"handlebars":191,"jquery":192}],207:[function(require,module,exports){
+},{"./array_includes_polyfill":207,"./constants":208,"./jquery_promise":209,"babelify-es6-polyfill":159,"handlebars":191,"jquery":192}],207:[function(require,module,exports){
+'use strict';
+
+if (!Array.prototype.includes) {
+  Array.prototype.includes = function (searchElement /*, fromIndex*/) {
+    'use strict';
+
+    var O = Object(this);
+    var len = parseInt(O.length) || 0;
+    if (len === 0) {
+      return false;
+    }
+    var n = parseInt(arguments[1]) || 0;
+    var k;
+    if (n >= 0) {
+      k = n;
+    } else {
+      k = len + n;
+      if (k < 0) {
+        k = 0;
+      }
+    }
+    var currentElement;
+    while (k < len) {
+      currentElement = O[k];
+      if (searchElement === currentElement || searchElement !== searchElement && currentElement !== currentElement) {
+        // NaN !== NaN
+        return true;
+      }
+      k++;
+    }
+    return false;
+  };
+}
+
+},{}],208:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -22256,7 +22292,7 @@ module.exports = {
   TOKEN_INFO_URL: 'tokeninfo'
 };
 
-},{}],208:[function(require,module,exports){
+},{}],209:[function(require,module,exports){
 "use strict";
 
 function AjaxError(jqXHR, textStatus, errorThrown) {
