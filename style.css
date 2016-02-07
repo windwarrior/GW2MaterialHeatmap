@@ -1,0 +1,70 @@
+.table th {
+  white-space: nowrap;
+}
+
+.item {
+  position: relative;
+  width: 10%;
+  overflow: hidden;
+  font-size: 0;
+
+  display: inline-block;
+
+  background-size: cover;
+  color: green;
+}
+
+.item:before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+
+.item-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;          /* Likely future */
+}
+
+.item-count {
+  position: absolute;
+  top: 2;
+  right: 5;
+
+  font-size: 12px;
+
+  color: black;
+
+  text-shadow:
+   -1px -1px 0 white,
+    1px -1px 0 white,
+    -1px 1px 0 white,
+     1px 1px 0 white;
+}
+
+.icon-compact {
+  width: 16px;
+  height: 16px;
+}
+
+.moneyBox {
+  min-width: fit-content;
+  white-space: nowrap;
+}
+
+#infofield, #helpfield {
+  border-left: 2px solid black;
+  display: none;
+}
+
+.small-hr {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
