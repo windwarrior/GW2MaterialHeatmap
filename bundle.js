@@ -16,10 +16,8 @@ $(function () {
     $("#APIToken").val(localStorage.getItem("API token"));
 
     $("#token-localstore-info").show();
-    console.log("Ik had al een token!");
   } else {
-    console.log("Ik had nog geen token");
-    localStorage.setItem("API token", "bogus");
+    $("#token-localstore-info").hide();
   }
 });
 
@@ -46,6 +44,8 @@ $("#apikey-form").submit(function (event) {
     $("#material-storage").html(createUI(obj));
 
     updateAllColors(obj);
+
+    $('[data-toggle="popover"]').popover();
 
     $(".item").dblclick(function (event) {
       var _this = this;
@@ -100,6 +100,7 @@ function createTokenValidatorPromise(token) {
   }).then(function (result) {
     // Set this valid token in the localStorage
     localStorage.setItem("API token", token);
+    $("#token-localstore-info").show();
 
     return result;
   }).then(function (result) {

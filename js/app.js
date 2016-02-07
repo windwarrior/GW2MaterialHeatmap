@@ -13,6 +13,8 @@ $(function() {
     $("#APIToken").val(localStorage.getItem("API token"));
 
     $("#token-localstore-info").show();
+  } else {
+    $("#token-localstore-info").hide();
   }
 });
 
@@ -39,6 +41,8 @@ $("#apikey-form").submit(function (event) {
     $("#material-storage").html(createUI(obj));
 
     updateAllColors(obj);
+
+    $('[data-toggle="popover"]').popover()
 
     $(".item").dblclick(function (event) {
       // we can now exclude this item from our visualisation
@@ -91,6 +95,7 @@ function createTokenValidatorPromise(token) {
   }).then(function (result) {
     // Set this valid token in the localStorage
     localStorage.setItem("API token", token);
+    $("#token-localstore-info").show();
 
     return result;
   }).then(function (result) {
