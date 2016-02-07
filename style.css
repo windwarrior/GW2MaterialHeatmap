@@ -60,7 +60,7 @@
 }
 
 #infofield, #helpfield {
-  border-left: 2px solid black;
+  border-left: 1px solid #ccc;
   display: none;
 }
 
@@ -71,4 +71,11 @@
 
 .help {
   border-bottom: 1px dotted black;
+}
+
+.row {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
 }
