@@ -222,8 +222,8 @@ function updateAllColors(obj) {
     } else if (value == 0 || "disabled" in item && item.disabled) {
       item["color"] = {
         h: 0,
-        s: 0,
-        l: 50
+        s: 100,
+        l: 100
       };
     } else {
       var percentage = 1 - (value - min_val) / (max_val - min_val);
@@ -12363,7 +12363,7 @@ function amdefine(module, requireFn) {
 
 module.exports = amdefine;
 
-}).call(this,require('_process'),"/node_modules/handlebars/node_modules/source-map/node_modules/amdefine/amdefine.js")
+}).call(this,require('_process'),"/..\\..\\..\\node_modules\\handlebars\\node_modules\\source-map\\node_modules\\amdefine\\amdefine.js")
 },{"_process":165,"path":164}],208:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.0

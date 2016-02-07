@@ -16,8 +16,8 @@ $("#apikey-form").submit(function (event) {
 
   // Lets also clear all previous errors
   $("#errors").empty();
-  
-  updateStatus("Creating Token..."); 
+
+  updateStatus("Creating Token...");
 
   let token = $("#APIToken").val();
 
@@ -184,7 +184,7 @@ function createUI(obj) {
 
 function updateAllColors(obj) {
   updateStatus("Updating Colors...");
-  
+
   // firstly we need to determine new min and max values
   let min_val = obj.items.reduce(function (min, item) {
     return !item.disabled && "total_value_sells" in item && item["total_value_sells"] > 0 && min > item["total_value_sells"] ? item["total_value_sells"] : min;
@@ -209,8 +209,8 @@ function updateAllColors(obj) {
     } else if (value == 0 || ("disabled" in item && item.disabled)) {
       item["color"] = {
         h: 0,
-        s: 0,
-        l: 50
+        s: 100,
+        l: 100
       }
     } else {
       let percentage = 1 - ((value - min_val) / (max_val - min_val));
@@ -224,7 +224,7 @@ function updateAllColors(obj) {
 
     $("#item-"+item.id+" .item-content").css({'background-color': `hsla(${item.color.h}, ${item.color.s}%, ${item.color.l}%, 0.75)`});
   });
-  
+
   updateStatus("Done!");
 }
 
