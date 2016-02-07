@@ -68,3 +68,7 @@
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
+.help {
+  border-bottom: 1px dotted black;
+}
