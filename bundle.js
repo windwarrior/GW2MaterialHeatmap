@@ -241,6 +241,25 @@ function updateAllColors(obj) {
   updateStatus("Done!");
 }
 
+Handlebars.registerHelper("formatSimpleGold", function (coin, icons) {
+  coin = Math.round(coin);
+  var gold = Math.floor(coin / 10000) % 100;
+  var silver = Math.floor(coin / 100) % 100;
+  var copper = Math.floor(coin) % 100;
+
+  var res = copper + 'c';
+
+  if (silver > 0) {
+    res = silver + 's' + res;
+  }
+
+  if (gold > 0) {
+    res = gold + 'g' + res;
+  }
+
+  return new Handlebars.SafeString(res);
+});
+
 },{"./constants":2,"./jquery_promise":3,"babelify-es6-polyfill":161,"handlebars":195,"jquery":208}],2:[function(require,module,exports){
 'use strict';
 
