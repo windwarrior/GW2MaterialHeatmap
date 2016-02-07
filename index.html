@@ -117,13 +117,22 @@
       <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" id="cat-{{id}}" data-id={{id}}>
         <h1>{{name}}</h1>
         <!-- Do not alter spacing here, it is important somehow :'( -->
-        {{#items}}<div id="item-{{id}}" data-id={{id}} class="item" style="background-image: url({{icon}});" data-trigger="hover" data-toggle="popover" title="{{name}}" data-content=" {{formatSimpleGold total_value_sells}}/{{formatSimpleGold total_value_buys}}">
+        {{#items}}<div id="item-{{id}}" data-id={{id}} class="item" style="background-image: url({{icon}});" data-trigger="hover" data-toggle="popover" title="{{name}}">
             <div class="item-content" style="background-color: hsla({{color.h}},{{color.s}}%,{{color.l}}%,0.75);">
                 <span class="item-count"> {{count}} </span>
             </div>
           </div>{{/items}}
       </div>
     {{/tabified}}
+  </script>
+
+  <script id="popover-detail-template" type="text/x-handlebars-template">
+    <dl>
+      <dt>TP buy:</dt>
+      <dd>{{formatSimpleGold item.total_value_buys}}</dd>
+      <dt>TP sell:</dt>
+      <dd>{{formatSimpleGold item.total_value_sells}}</dd>
+    </dl>
   </script>
 </body>
 </html>

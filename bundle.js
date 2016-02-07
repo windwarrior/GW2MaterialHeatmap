@@ -8,10 +8,13 @@ require("babelify-es6-polyfill");
 var constants = require("./constants");
 var Handlebars = require('handlebars');
 
-var storage = [];
+var storage = {};
 
 $(function () {
   updateStatus("Creating Base...");
+
+  $("#token-localstore-info").hide();
+
   createMaterialsPromise().then(function (matresult) {
     var item_ids = matresult.reduce(function (a, b) {
       return a.concat(b.items);
@@ -26,8 +29,7 @@ $(function () {
           });
         });
       });
-      var result = [];
-      result = obj;
+      var result = obj;
       result["categories"] = matresult;
       return result;
     });
@@ -41,8 +43,6 @@ $(function () {
       $("#APIToken").val(localStorage.getItem("API token"));
 
       $("#token-localstore-info").show();
-    } else {
-      $("#token-localstore-info").hide();
     }
   });
 });
@@ -67,14 +67,23 @@ $("#apikey-form").submit(function (event) {
     console.log(obj);
     updateAllColors(obj);
 
-    $('[data-toggle="popover"]').popover();
+    $('[data-toggle="popover"]').popover({
+      html: true,
+      content: function content() {
+        var _this = this;
+
+        return createPopover(obj.items.find(function (x) {
+          return x.id == $(_this).data("id");
+        }));
+      }
+    });
 
     $(".item").dblclick(function (event) {
-      var _this = this;
+      var _this2 = this;
 
       // we can now exclude this item from our visualisation
       var item = obj.items.find(function (x) {
-        return x.id == $(_this).data("id");
+        return x.id == $(_this2).data("id");
       });
       var min = obj.min_value;
       var max = obj.max_value;
@@ -211,6 +220,17 @@ function createItemTransformPromise(items) {
     storage["items"] = items;
     return storage;
   });
+}
+
+function createPopover(item) {
+  var source = $("#popover-detail-template").html();
+  var template = Handlebars.compile(source);
+
+  var context = { item: item };
+
+  var html = template(context);
+
+  return html;
 }
 
 function createUI(obj) {
@@ -12399,7 +12419,7 @@ function amdefine(module, requireFn) {
 
 module.exports = amdefine;
 
-}).call(this,require('_process'),"/node_modules/handlebars/node_modules/source-map/node_modules/amdefine/amdefine.js")
+}).call(this,require('_process'),"/..\\..\\..\\node_modules\\handlebars\\node_modules\\source-map\\node_modules\\amdefine\\amdefine.js")
 },{"_process":165,"path":164}],208:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.0

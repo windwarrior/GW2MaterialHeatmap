@@ -5,7 +5,7 @@ require("babelify-es6-polyfill");
 var constants = require("./constants");
 var Handlebars = require('handlebars');
 
-var storage = [];
+var storage = {};
 
 $(function() {
   updateStatus("Creating Base...");
@@ -24,8 +24,7 @@ $(function() {
           return obj.items.find(x => itemid == x.id);
         });
       });
-      let result = [];
-      result = obj;
+      let result = obj;
       result["categories"] = matresult;
       return result;
     });
@@ -64,7 +63,12 @@ $("#apikey-form").submit(function (event) {
     console.log(obj);
     updateAllColors(obj);
 
-    $('[data-toggle="popover"]').popover()
+    $('[data-toggle="popover"]').popover({
+      html: true,
+      content: function () {
+        return createPopover(obj.items.find(x => x.id == $(this).data("id")));
+      }
+    })
 
     $(".item").dblclick(function (event) {
       // we can now exclude this item from our visualisation
@@ -202,6 +206,17 @@ function createItemTransformPromise(items) {
     storage["items"] = items;
     return storage;
   });
+}
+
+function createPopover(item) {
+  var source = $("#popover-detail-template").html();
+  var template = Handlebars.compile(source);
+
+  var context = {item: item};
+
+  var html = template(context);
+
+  return html;
 }
 
 function createUI(obj) {
