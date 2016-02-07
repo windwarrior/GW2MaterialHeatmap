@@ -46,6 +46,7 @@ $(function() {
     createUI(result["categories"]);
     storage = result;
     updateStatus("Ready!");
+    $('#heatmap-btn').prop('disabled', false);
 
     if (localStorage.getItem("API token")) {
       $("#APIToken").val(localStorage.getItem("API token"));

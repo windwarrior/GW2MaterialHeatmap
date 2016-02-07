@@ -71,12 +71,7 @@
     #infobar-content .moneyBox {
       display: inline-block;
     }
-    /*
-    #legenda #colors {
-      height: 16px;
 
-      background-image: linear-gradient(90deg, hsla(180, 100%, 50%, 0.75), hsla(120, 100%, 50%, 0.75), hsla(60, 100%, 50%, 0.75), hsla(0, 100%, 50%, 0.75));
-    }*/
   </style>
 </head>
 <body>
@@ -100,7 +95,7 @@
             <input type="text" class="form-control" id="APIToken" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
             <span class="glyphicon glyphicon-floppy-saved form-control-feedback" id="token-localstore-info" aria-hidden="true"></span>
           </div>
-          <button type="submit" class="btn btn-primary">Generate heatmap!</button> <span id="status">Loading page...</span>
+          <button type="submit" class="btn btn-primary" id="heatmap-btn" disabled >Generate heatmap!</button> <span id="status">Loading page...</span>
         </form>
       </div>
     </div>
