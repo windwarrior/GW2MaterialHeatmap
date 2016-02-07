@@ -13,10 +13,6 @@ $(function() {
     $("#APIToken").val(localStorage.getItem("API token"));
 
     $("#token-localstore-info").show();
-    console.log("Ik had al een token!");
-  } else {
-    console.log("Ik had nog geen token");
-    localStorage.setItem("API token", "bogus");
   }
 });
 
