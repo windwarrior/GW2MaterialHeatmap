@@ -190,9 +190,7 @@ function updateInfo() {
   var context = { total_buy: total_buy, total_sell: total_sell };
   var html = template(context);
   console.log(html);
-  $('#infobar-content').html(html);
-  $('#infobar').show();
-  $('#infobar-hr').show();
+  $('#infofield').html(html);
 }
 
 function createItemTransformPromise(items) {
