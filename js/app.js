@@ -31,18 +31,18 @@ $(function() {
     });
 
   }).then(function(result) {
-    
+
     Promise.resolve($.ajax("https://api.guildwars2.com/v1/files.json")).then(function (fileJson) {
       for (let icon_name of ["ui_coin_gold", "ui_coin_silver", "ui_coin_copper"]) {
         let signature = fileJson[icon_name]["signature"];
         let file_id = fileJson[icon_name]["file_id"];
-  
+
         let gold_icon_location = `https://render.guildwars2.com/file/${signature}/${file_id}.png`;
         icons[icon_name] = `<img class="icon-compact" src="${gold_icon_location}"/>`;
       }
     });
-    
-    
+
+
     createUI(result["categories"]);
     storage = result;
     updateStatus("Ready!");
@@ -53,6 +53,12 @@ $(function() {
 
       $("#token-localstore-info").show();
     }
+  }).catch(function (error) {
+    var source = $("#error-template").html();
+    var template = Handlebars.compile(source);
+    var context = { error: error.message };
+    var html = template(context);
+    $("#errors").append(html);
   });
 });
 
@@ -75,6 +81,12 @@ $("#apikey-form").submit(function (event) {
   }).then(function (obj) {
     updateInfo();
     updateAllColors(obj);
+  }).catch(function (error) {
+    var source = $("#error-template").html();
+    var template = Handlebars.compile(source);
+    var context = { error: error.message };
+    var html = template(context);
+    $("#errors").append(html);
   });
 });
 
@@ -232,7 +244,7 @@ function createUI(obj) {
   var html = template(context);
 
   $("#material-storage").html(html);
-  
+
   $('[data-toggle="popover"]').popover({
       html: true,
       placement: 'auto',
@@ -240,15 +252,15 @@ function createUI(obj) {
         return createPopover(storage.items.find(x => x.id == $(this).data("id")));
       }
     });
-    
+
   $(".item").dblclick(function (event) {
     // we can now exclude this item from our visualisation
     let item = storage.items.find(x => x.id == $(this).data("id"));
     let min = storage.min_value;
     let max = storage.max_value;
-  
+
     item.disabled = !item.disabled;
-  
+
     if (item.total_value_sells > 0 && item.total_value_sells <= min) {
       updateAllColors(storage);
     } else if(item.total_value_sells >= max) {
