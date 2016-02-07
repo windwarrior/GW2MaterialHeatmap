@@ -59,16 +59,28 @@
   white-space: nowrap;
 }
 
+#optionsfield, #infofield, #helpfield {
+  border-left: 2px solid #666;
+}
+
 #infofield, #helpfield {
-  border-left: 2px solid black;
   display: none;
 }
 
-.small-hr {
-  margin-top: 10px;
-  margin-bottom: 10px;
+#helpfield ul {
+    padding-left: 20px;
 }
 
 .help {
   border-bottom: 1px dotted black;
+}
+
+#menu {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+@media (min-width: 991px) {
+    #menu>div {
+        height: 130px;
+    }
 }

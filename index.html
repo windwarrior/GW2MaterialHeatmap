@@ -6,7 +6,7 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-xs-12">
+      <div class="col-sm-12">
         <div class="page-header">
           <h1>Material Heatmap <small>quickly find those valuable items in your material storage</small></h1>
         </div>
@@ -16,8 +16,9 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-xs-12 col-sm-4" id="main">
+    
+    <div class="row" id="menu">
+      <div class="col-sm-12 col-md-4" id="main">
         <form id="apikey-form">
           <div class="form-group has-feedback" id="token-group">
             <label for="APIToken">API Token (needs inventory permission) 
@@ -29,9 +30,23 @@
           <button type="submit" class="btn btn-primary" id="heatmap-btn" disabled >Generate heatmap!</button> <span id="status">Loading page...</span>
         </form>
       </div>
-      <div class="col-xs-12 col-sm-2" id="infofield">
+      <div class="col-sm-12 col-md-2" id="optionsfield">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" data-toggle="toggle" id="tooltip-tgl">
+            Show tooltip prices per item or stack
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" data-toggle="toggle" id="heatmap-tgl">
+            Heatmap per item or stack price
+          </label>
+        </div>
       </div>
-      <div class="col-xs-12 col-sm-6" id="helpfield">
+      <div class="col-sm-12 col-md-1" id="infofield">
+      </div>
+      <div class="col-sm-12 col-md-5" id="helpfield">
         <ul>
           <li>Red shows the most valuable stack in your storage, blue the least</li>
           <li>Double click an item to remove it from the heatmap, recalculating the colours. (Try this with your most valuable items!)</li>
@@ -39,8 +54,6 @@
         </ul>
       </div>
     </div>
-
-    <hr class="small-hr">
   
     <div class="row">
       <div id="material-storage"></div>
@@ -54,6 +67,9 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">-->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  
+  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">
+  <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.0/js/bootstrap-toggle.min.js"></script>
 
   <script id="error-template" type="text/x-handlebars-template">
     <div class="alert alert-danger alert-dismissible" role="alert">
@@ -77,8 +93,8 @@
   </script>
 
   <script id="popover-detail-template" type="text/x-handlebars-template">
-    <b>TP buy:</b> {{formatGold item.total_value_buys}}
-    <b>TP sell:</b> {{formatGold item.total_value_sells}}
+    <b>TP buy:</b> {{formatGold value_buys}}
+    <b>TP sell:</b> {{formatGold value_sells}}
   </script>
   
   <script id="info-template" type="text/x-handlebars-template">
