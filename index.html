@@ -63,6 +63,14 @@
       min-width: fit-content;
       white-space: nowrap;
     }
+    
+    #infobar, #infobar-hr {
+      display: none;
+    }
+    
+    #infobar-content .moneyBox {
+      display: inline-block;
+    }
     /*
     #legenda #colors {
       height: 16px;
@@ -94,19 +102,24 @@
           </div>
           <button type="submit" class="btn btn-primary">Generate heatmap!</button> <span id="status">Loading page...</span>
         </form>
-      </h2>
+      </div>
     </div>
-  </div>
 
-  <hr>
-
-  <div class="row">
-    <div id="material-storage">
-
+    <hr>
+    
+    <div class="row" id="infobar">
+      <div class="col-xs-12 col-sm-6" id="infobar-content">
+        INFO
+      </div>
     </div>
+    <hr id="infobar-hr">
+  
+    <div class="row">
+      <div id="material-storage"></div>
+    </div>
+    
   </div>
-
-
+  
   <script type="text/javascript" src="bundle.js"></script>
 
   <!-- bootstrap related files -->
@@ -139,5 +152,11 @@
     <b>TP buy:</b> {{formatGold item.total_value_buys}}
     <b>TP sell:</b> {{formatGold item.total_value_sells}}
   </script>
+  
+  <script id="info-template" type="text/x-handlebars-template">
+    <b>Total TP buy:</b> {{formatGold total_buy}} <br>
+    <b>Total TP sell:</b> {{formatGold total_sell}}
+  </script>
+  
 </body>
 </html>

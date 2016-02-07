@@ -45,7 +45,6 @@ $(function() {
     
     createUI(result["categories"]);
     storage = result;
-    console.log(storage);
     updateStatus("Ready!");
 
     if (localStorage.getItem("API token")) {
@@ -73,27 +72,8 @@ $("#apikey-form").submit(function (event) {
   }).then(function (result) {
     return createItemTransformPromise(result["items"]);
   }).then(function (obj) {
-    console.log(obj);
+    updateInfo();
     updateAllColors(obj);
-
-    $(".item").dblclick(function (event) {
-      // we can now exclude this item from our visualisation
-      let item = obj.items.find(x => x.id == $(this).data("id"));
-      let min = obj.min_value;
-      let max = obj.max_value;
-
-      item.disabled = !item.disabled;
-
-      if (item.total_value_sells > 0 && item.total_value_sells <= min) {
-        updateAllColors(obj);
-      } else if(item.total_value_sells >= max) {
-        updateAllColors(obj);
-      } else {
-        // We can simply update this single item, is a bit less harsh on this device
-        updateSingleColor(item, obj.min_value, obj.max_value);
-      }
-
-    });
   });
 });
 
@@ -188,6 +168,23 @@ function createAccountPromise(token_info) {
   });
 }
 
+function updateInfo() {
+  var source = $("#info-template").html();
+  var template = Handlebars.compile(source);
+  let total_buy = storage.items.reduce(function(sum,item) {
+    return sum + item["total_value_buys"];
+  }, 0);
+  let total_sell = storage.items.reduce(function(sum,item) {
+    return sum + item["total_value_sells"];
+  }, 0);
+  var context = {total_buy: total_buy, total_sell: total_sell};
+  var html = template(context);
+  console.log(html);
+  $('#infobar-content').html(html);
+  $('#infobar').show();
+  $('#infobar-hr').show();
+}
+
 function createItemTransformPromise(items) {
   return Promise.resolve(items).then(function (items) {
     items.forEach(x => {
@@ -244,6 +241,25 @@ function createUI(obj) {
         return createPopover(storage.items.find(x => x.id == $(this).data("id")));
       }
     });
+    
+  $(".item").dblclick(function (event) {
+    // we can now exclude this item from our visualisation
+    let item = storage.items.find(x => x.id == $(this).data("id"));
+    let min = storage.min_value;
+    let max = storage.max_value;
+  
+    item.disabled = !item.disabled;
+  
+    if (item.total_value_sells > 0 && item.total_value_sells <= min) {
+      updateAllColors(storage);
+    } else if(item.total_value_sells >= max) {
+      updateAllColors(storage);
+    } else {
+      // We can simply update this single item, is a bit less harsh on this device
+      updateSingleColor(item, storage.min_value, storage.max_value);
+    }
+
+  });
 }
 
 function updateAllColors(obj) {
@@ -298,7 +314,7 @@ function updateSingleColor(item, min_val, max_val) {
 
 Handlebars.registerHelper("formatGold", function(coin) {
   coin = Math.round(coin);
-  var gold   = Math.floor(coin / 10000) % 100;
+  var gold   = Math.floor(coin / 10000);
   var silver = Math.floor(coin / 100) % 100;
   var copper = Math.floor(coin) % 100;
 
