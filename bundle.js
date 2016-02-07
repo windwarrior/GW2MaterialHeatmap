@@ -48,15 +48,11 @@ $("#apikey-form").submit(function (event) {
       var min = obj.min_value;
       var max = obj.max_value;
 
-      console.log(min + ' <= ' + item.total_value_sells + ' <= ' + max);
-
       item.disabled = !item.disabled;
 
       if (item.total_value_sells > 0 && item.total_value_sells <= min) {
-        console.log("Dat was de goedkoopste :'(");
         updateAllColors(obj);
       } else if (item.total_value_sells >= max) {
-        console.log("Dat was de duurste :'(");
         updateAllColors(obj);
       } else {
         // We can simply update this single item, is a bit less harsh on this device
@@ -64,8 +60,6 @@ $("#apikey-form").submit(function (event) {
       }
     });
   }).catch(function (error) {
-    console.log(error);
-
     var source = $("#error-template").html();
     var template = Handlebars.compile(source);
 
@@ -240,9 +234,6 @@ function updateAllColors(obj) {
         l: 50
       };
     }
-
-    console.log("updating color!");
-    console.log('hsla(' + item.color.h + ', ' + item.color.s + '%, ' + item.color.l + '%, 0.75)');
 
     $("#item-" + item.id + " .item-content").css({ 'background-color': 'hsla(' + item.color.h + ', ' + item.color.s + '%, ' + item.color.l + '%, 0.75)' });
   });
