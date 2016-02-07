@@ -97,6 +97,7 @@ $("#apikey-form").submit(function (event) {
     var context = { error: error.message };
     var html = template(context);
     $("#errors").append(html);
+    updateStatus("Error!");
   });
 });
 
