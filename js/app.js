@@ -8,6 +8,16 @@ var Handlebars = require('handlebars');
 $(function() {
   // Page ready
   updateStatus("Ready!");
+
+  if (localStorage.getItem("API token")) {
+    $("#APIToken").val(localStorage.getItem("API token"));
+
+    $("#token-localstore-info").show();
+    console.log("Ik had al een token!");
+  } else {
+    console.log("Ik had nog geen token");
+    localStorage.setItem("API token", "bogus");
+  }
 });
 
 $("#apikey-form").submit(function (event) {
@@ -82,6 +92,11 @@ function createTokenValidatorPromise(token) {
     return Promise.resolve($.get(token_info_url));
   }).then(function (result) {
     return "permissions" in result && result.permissions.includes("inventories") ? Promise.resolve(result) : Promise.reject(Error("The token you provided doesn't have inventories permission!"));
+  }).then(function (result) {
+    // Set this valid token in the localStorage
+    localStorage.setItem("API token", token);
+
+    return result;
   }).then(function (result) {
     return $.extend(result, {'token': token});
   });
