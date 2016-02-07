@@ -196,8 +196,10 @@ function updateInfo() {
   }, 0);
   var context = {total_buy: total_buy, total_sell: total_sell};
   var html = template(context);
-  console.log(html);
+
   $('#infofield').html(html);
+  $('#infofield').show();
+  $('#helpfield').show();
 }
 
 function createItemTransformPromise(items) {
