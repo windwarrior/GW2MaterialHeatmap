@@ -13,22 +13,35 @@ $(function() {
   updateStatus("Creating Base...");
 
   $("#token-localstore-info").hide();
-  
+
   // Create Toggle button stuff
   $("#tooltip-tgl").bootstrapToggle({
     on: 'Item',
     off: 'Stack',
-    size: 'small'
+    size: 'small',
+    width: '95px',
   });
-  
+
   $("#heatmap-tgl").bootstrapToggle({
     on: 'Item',
     off: 'Stack',
-    size: 'small'
+    size: 'small',
+    width: '95px',
   });
-  
+
   $("#heatmap-tgl").change(updateAllColors);
-  
+
+  $("#listing-tgl").bootstrapToggle({
+    on: 'Buy order',
+    off: 'Sell order',
+    size: 'small',
+    width: '95px',
+  });
+
+  $("#listing-tgl").change(updateAllColors);
+
+  $("#listing-tgl").change(updateAllColors);
+
   $("#APIToken").keyup(function () {
     $(this).val($.trim($(this).val()));
   });
@@ -307,26 +320,30 @@ function updateAllColors() {
   // firstly we need to determine new min and max values
   let min_val = 0;
   let max_val = 0;
+
+  let using = $("#listing-tgl").prop('checked') ?  'buys' : 'sells';
+
+
   if($('#heatmap-tgl').prop('checked')) {
     min_val = storage.items.reduce(function (min, item) {
-      return !item.disabled && "sells" in item && item["sells"]["unit_price"] > 0 && item.count > 0 && min > item["sells"]["unit_price"] ? item["sells"]["unit_price"] : min;
+      return !item.disabled && using in item && item[using]["unit_price"] > 0 && item.count > 0 && min > item[using]["unit_price"] ? item[using]["unit_price"] : min;
     }, Number.MAX_VALUE);
-  
+
     max_val = storage.items.reduce(function (max, item) {
-      return !item.disabled && "sells" in item && item["sells"]["unit_price"] > 0 && item.count > 0 && max < item["sells"]["unit_price"] ? item["sells"]["unit_price"] : max;
+      return !item.disabled && using in item && item[using]["unit_price"] > 0 && item.count > 0 && max < item[using]["unit_price"] ? item[using]["unit_price"] : max;
     }, Number.MIN_VALUE);
   } else {
     min_val = storage.items.reduce(function (min, item) {
-      return !item.disabled && "total_value_sells" in item && item["total_value_sells"] > 0 && min > item["total_value_sells"] ? item["total_value_sells"] : min;
+      return !item.disabled && `total_value_${using}` in item && item[`total_value_${using}`] > 0 && min > item[`total_value_${using}`] ? item[`total_value_${using}`] : min;
     }, Number.MAX_VALUE);
-  
+
     max_val = storage.items.reduce(function (max, item) {
-      return !item.disabled && "total_value_sells" in item && item["total_value_sells"] > 0 && max < item["total_value_sells"] ? item["total_value_sells"] : max;
+      return !item.disabled && `total_value_${using}` in item && item[`total_value_${using}`] > 0 && max < item[`total_value_${using}`] ? item[`total_value_${using}`] : max;
     }, Number.MIN_VALUE);
   }
   storage.min_value = min_val;
   storage.max_value = max_val;
-  
+
   storage.items.forEach(function (item) {
     updateSingleColor(item, min_val, max_val);
   });
@@ -336,17 +353,23 @@ function updateAllColors() {
 
 function updateSingleColor(item, min_val, max_val) {
   let value = 0;
+
+  let using = $("#listing-tgl").prop('checked') ?  'buys' : 'sells';
+
   if($('#heatmap-tgl').prop('checked')) {
-    value = "sells" in item ? item["sells"]["unit_price"] : 0;
+    value = using in item ? item[using]["unit_price"] : 0;
   } else {
-    value = "total_value_sells" in item ? item["total_value_sells"] : 0;
+    value = `total_value_${using}` in item ? item[`total_value_${using}`] : 0;
   }
+
+  let percentage = 0;
+
   if (item.disabled) {
     item["color"] = {h: 0, s: 0, l: 25};
-  } else if (value == 0 || item.count == 0 || ("disabled" in item && item.disabled)) {
+  } else if (value == 0 || item.count == 0) {
     item["color"] = {h: 0, s: 100, l: 100};
   } else {
-    let percentage = 1 - ((value - min_val) / (max_val - min_val));
+    percentage = 1 - ((value - min_val) / (max_val - min_val));
     item["color"] = {h: percentage * 180, s: 100, l: 50};
   }
 

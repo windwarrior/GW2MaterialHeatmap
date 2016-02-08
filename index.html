@@ -16,12 +16,12 @@
         </div>
       </div>
     </div>
-    
+
     <div class="row" id="menu">
       <div class="col-sm-12 col-md-4" id="main">
         <form id="apikey-form">
           <div class="form-group has-feedback" id="token-group">
-            <label for="APIToken">API Token (needs inventory permission) 
+            <label for="APIToken">API Token (needs inventory permission)
               (<span class="help" title="Get your API key from the Guild Wars 2 website at account.arena.net/applications">?</span>)
             </label>
             <input type="text" class="form-control" id="APIToken" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
@@ -29,20 +29,6 @@
           </div>
           <button type="submit" class="btn btn-primary" id="heatmap-btn" disabled >Generate heatmap!</button> <span id="status">Loading page...</span>
         </form>
-      </div>
-      <div class="col-sm-12 col-md-2" id="optionsfield">
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" data-toggle="toggle" id="tooltip-tgl">
-            Show tooltip prices per item or stack
-          </label>
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" data-toggle="toggle" id="heatmap-tgl">
-            Heatmap per item or stack price
-          </label>
-        </div>
       </div>
       <div class="col-sm-12 col-md-1" id="infofield">
       </div>
@@ -54,20 +40,61 @@
         </ul>
       </div>
     </div>
-  
+
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-ml-4 col-lg-offset-1 col-lg-3">
+        <div class="checkbox">
+          <div class="pull-left">
+            <label>
+              Tooltip prices per
+            </label>
+          </div>
+          <div  class="pull-right">
+            <input type="checkbox" data-toggle="toggle" id="tooltip-tgl">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-6 col-ml-4 col-lg-3">
+        <div class="checkbox">
+          <div class="pull-left">
+            <label>
+              Material prices per
+            </label>
+          </div>
+          <div class="pull-right">
+            <input type="checkbox" data-toggle="toggle" id="heatmap-tgl">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-6 col-ml-4 col-lg-3">
+        <div class="checkbox">
+          <div class="pull-left">
+            <label>
+              Material prices using
+            </label>
+          </div>
+          <div class="pull-right">
+            <input type="checkbox" data-toggle="toggle" id="listing-tgl">
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="row">
       <div id="material-storage"></div>
     </div>
-    
+
   </div>
-  
+
   <script type="text/javascript" src="bundle.js"></script>
 
   <!-- bootstrap related files -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">-->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  
+
   <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">
   <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.0/js/bootstrap-toggle.min.js"></script>
 
@@ -96,11 +123,11 @@
     <b>TP buy:</b> {{formatGold value_buys}}
     <b>TP sell:</b> {{formatGold value_sells}}
   </script>
-  
+
   <script id="info-template" type="text/x-handlebars-template">
     <b>Total TP buy:</b> {{formatGold total_buy}} <br>
     <b>Total TP sell:</b> {{formatGold total_sell}}
   </script>
-  
+
 </body>
 </html>

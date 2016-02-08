@@ -60,7 +60,7 @@
 }
 
 #optionsfield, #infofield, #helpfield {
-  border-left: 2px solid #666;
+  border-left: 1px solid #ccc;
 }
 #optionsfield {
     min-width: 200px;
@@ -70,7 +70,7 @@
   min-width: 125px;
 }
 
-#helpfield { 
+#helpfield {
   display: none;
 }
 
