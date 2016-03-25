@@ -1,3 +1,6 @@
+# Requirements
+This project uses [`node.js`](https://nodejs.org/) modules for bundling the content.  Make sure you download `node.js` v4.X.X from their [website](https://nodejs.org/en/download/).
+
 # Installation
 Install all dependencies:
 ```
