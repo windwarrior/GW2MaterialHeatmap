@@ -26,3 +26,5 @@ Open up the server to play around with your changes with:
 ```
 npm start
 ```
+
+Then hit http://localhost:8080/ in your browser and have at it!
