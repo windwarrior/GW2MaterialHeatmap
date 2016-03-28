@@ -28,3 +28,7 @@ npm start
 ```
 
 Then hit http://localhost:8080/ in your browser and have at it!
+
+# License
+
+[MIT](LICENSE)
