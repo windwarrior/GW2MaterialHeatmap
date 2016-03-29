@@ -1,0 +1,33 @@
+{
+  "name": "gw2-material-heatmap",
+  "version": "1.0.0",
+  "description": "Heatmap visualization of gw2 materials.",
+  "main": "index.html",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-preset-es2015": "^6.5.0",
+    "babelify": "^7.2.0",
+    "babelify-es6-polyfill": "^1.0.4",
+    "browserify": "^13.0.0",
+    "handlebars": "^4.0.5",
+    "http-server": "^0.9.0",
+    "jquery": "^2.2.0",
+    "watchify": "^3.7.0"
+  },
+  "scripts": {
+    "bundle": "browserify js/app.js -t babelify -o bundle.js",
+    "watch": "watchify js/app.js -t babelify -o bundle.js",
+    "start": "http-server ./"
+  },
+  "engine": "node >= 4.X.X",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/windwarrior/GW2MaterialHeatmap.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/windwarrior/GW2MaterialHeatmap/issues"
+  },
+  "homepage": "https://github.com/windwarrior/GW2MaterialHeatmap#readme"
+}
