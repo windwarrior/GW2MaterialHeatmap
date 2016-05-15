@@ -1,4 +1,4 @@
-window.$ = window.jQuery = require('jquery');
+var $ = window.$ = window.jQuery = require('jquery');
 require('./jquery_promise');
 require("babelify-es6-polyfill");
 require("./array_includes_polyfill");
@@ -43,7 +43,7 @@ $(function() {
   $("#listing-tgl").change(updateAllColors);
 
   $("#APIToken").keyup(function () {
-    $(this).val($.trim($(this).val()));
+    
   });
 
   createMaterialsPromise().then(function(matresult) {
@@ -85,6 +85,7 @@ $(function() {
       $("#APIToken").val(localStorage.getItem("API token"));
 
       $("#token-localstore-info").show();
+      $("#apikey-form").submit();
     }
   }).catch(function (error) {
     var source = $("#error-template").html();
@@ -104,7 +105,9 @@ $("#apikey-form").submit(function (event) {
 
   updateStatus("Creating Token...");
 
-  let token = $("#APIToken").val();
+  
+  let token = $.trim($("#APIToken").val());
+  $("#APIToken").val(token);
 
   createTokenValidatorPromise(token).then(function (token_info) {
     updateStatus("Creating Account Promise...");
