@@ -100,3 +100,16 @@
 .row{
   overflow: hidden;
 }
+
+.cat-info {
+  font-size: 0.4em;
+  display: inline-block;
+}
+
+.cat-info .moneyBox {
+  display: inline;
+}
+
+h1 {
+  font-size: 32px !important;
+}

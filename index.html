@@ -37,7 +37,7 @@
           <li>Red shows the most valuable stack in your storage, blue the least</li>
           <li>Double click an item to remove it from the heatmap, recalculating the colours. (Try this with your most valuable items!)</li>
           <li>Hover over items to see what the stack is worth as buy- or sell-order on the Trading Post</li>
-          <li>Total TP Buy/Sell is after tax (15% is deducted)</li>
+          <li>Total TP Buy/Sell is after tax (15% is deducted) and only sums enabled items</li>
         </ul>
       </div>
     </div>
@@ -109,7 +109,7 @@
   <script id="material-tab-template" type="text/x-handlebars-template">
     {{#tabified}}
       <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" id="cat-{{id}}" data-id={{id}}>
-        <h1>{{name}}</h1>
+        <h1>{{name}}  <div id="cat-info-{{id}}" class="cat-info"></small></h1>
         <!-- Do not alter spacing here, it is important somehow :'( -->
         {{#items}}<div id="item-{{id}}" data-id={{id}} class="item" style="background-image: url({{icon}});" data-trigger="hover" data-toggle="popover" title="{{name}}">
             <div class="item-content" style="background-color: hsla({{color.h}},{{color.s}}%,{{color.l}}%,0.75);">
@@ -128,6 +128,11 @@
   <script id="info-template" type="text/x-handlebars-template">
     <b>Total TP buy:</b> {{formatGold total_buy}} <br>
     <b>Total TP sell:</b> {{formatGold total_sell}}
+  </script>
+  
+  <script id="cat-info-template" type="text/x-handlebars-template">
+    <b>TP buy:</b> {{formatGold cat_buy}} <br>
+    <b>TP sell:</b> {{formatGold cat_sell}}
   </script>
 
 </body>

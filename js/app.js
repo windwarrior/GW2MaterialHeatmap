@@ -42,9 +42,6 @@ $(function() {
 
   $("#listing-tgl").change(updateAllColors);
 
-  $("#APIToken").keyup(function () {
-    
-  });
 
   createMaterialsPromise().then(function(matresult) {
     let item_ids = matresult.reduce(function(a,b) {
@@ -233,6 +230,24 @@ function updateInfo() {
   $('#infofield').html(html);
   $('#infofield').show();
   $('#helpfield').show();
+  
+  console.log(storage);
+  
+  var catinfosource = $("#cat-info-template").html();
+  var cattemplate = Handlebars.compile(catinfosource);
+  
+  storage.categories.forEach(cat => {
+    let cat_buy = cat.items.reduce(function(sum,item) {
+      return item["disabled"] ? sum : sum + item["total_value_buys"];
+    }, 0) * 0.85;
+    let cat_sell = cat.items.reduce(function(sum,item) {
+      return item["disabled"] ? sum : sum + item["total_value_sells"];
+    }, 0) * 0.85;
+    var context = {cat_buy: cat_buy, cat_sell: cat_sell};
+    var html = cattemplate(context);
+    $("#cat-info-"+cat.id).html(html);
+  });
+  
 }
 
 function createItemTransformPromise(items) {
