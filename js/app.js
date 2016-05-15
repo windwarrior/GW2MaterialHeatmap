@@ -105,7 +105,6 @@ $("#apikey-form").submit(function (event) {
 
   updateStatus("Creating Token...");
 
-  
   let token = $.trim($("#APIToken").val());
   $("#APIToken").val(token);
 
@@ -219,14 +218,15 @@ function createAccountPromise(token_info) {
 }
 
 function updateInfo() {
+  console.log("Updateinfo");
   var source = $("#info-template").html();
   var template = Handlebars.compile(source);
   let total_buy = storage.items.reduce(function(sum,item) {
-    return sum + item["total_value_buys"];
-  }, 0);
+    return item["disabled"] ? sum : sum + item["total_value_buys"];
+  }, 0) * 0.85;
   let total_sell = storage.items.reduce(function(sum,item) {
-    return sum + item["total_value_sells"];
-  }, 0);
+    return item["disabled"] ? sum : sum + item["total_value_sells"];
+  }, 0) * 0.85;
   var context = {total_buy: total_buy, total_sell: total_sell};
   var html = template(context);
 
@@ -304,7 +304,7 @@ function createUI(obj) {
     let max = storage.max_value;
 
     item.disabled = !item.disabled;
-
+    updateInfo();
     if (item.total_value_sells > 0 && item.total_value_sells <= min) {
       updateAllColors();
     } else if(item.total_value_sells >= max) {
@@ -318,8 +318,8 @@ function createUI(obj) {
 }
 
 function updateAllColors() {
-  updateStatus("Updating Colors...");
-
+  updateStatus("Updating Colors & Info...");
+  
   // firstly we need to determine new min and max values
   let min_val = 0;
   let max_val = 0;
