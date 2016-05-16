@@ -215,7 +215,6 @@ function createAccountPromise(token_info) {
 }
 
 function updateInfo() {
-  console.log("Updateinfo");
   var source = $("#info-template").html();
   var template = Handlebars.compile(source);
   let total_buy = storage.items.reduce(function(sum,item) {
@@ -230,8 +229,6 @@ function updateInfo() {
   $('#infofield').html(html);
   $('#infofield').show();
   $('#helpfield').show();
-  
-  console.log(storage);
   
   var catinfosource = $("#cat-info-template").html();
   var cattemplate = Handlebars.compile(catinfosource);
@@ -387,8 +384,10 @@ function updateSingleColor(item, min_val, max_val) {
   } else if (value == 0 || item.count == 0) {
     item["color"] = {h: 0, s: 100, l: 100};
   } else {
-    percentage = 1 - ((value - min_val) / (max_val - min_val));
-    item["color"] = {h: percentage * 180, s: 100, l: 50};
+    percentage = (((value - min_val) / (max_val - min_val))) * 100;
+    let logpercentage = Math.log(percentage + 1) / Math.log(Math.pow(101,(1/100)));
+    console.log(percentage+" => "+logpercentage);
+    item["color"] = {h: (100-logpercentage) * 1.80, s: 100, l: 50};
   }
 
   $("#item-"+item.id+" .item-content").css({'background-color': `hsla(${item.color.h}, ${item.color.s}%, ${item.color.l}%, 0.75)`});
