@@ -388,10 +388,6 @@ function updateSingleColor(item, min_val, max_val) {
   } else {
     percentage = (((value - min_val) / (max_val - min_val))) * 100;
     let logpercentage = Math.log(percentage + 1) / Math.log(Math.pow(101,(1/100)));
-<<<<<<< Updated upstream
-    console.log(percentage+" => "+logpercentage);
-=======
->>>>>>> Stashed changes
     item["color"] = {h: (100-logpercentage) * 1.80, s: 100, l: 50};
   }
 
