@@ -70,20 +70,22 @@ $(function() {
         let gold_icon_location = `https://render.guildwars2.com/file/${signature}/${file_id}.png`;
         icons[icon_name] = `<img class="icon-compact" src="${gold_icon_location}"/>`;
       }
+      
+      createUI(result["categories"]);
+      storage = result;
+      updateStatus("Ready!");
+      $('#heatmap-btn').prop('disabled', false);
+  
+      if (localStorage.getItem("API token")) {
+        $("#APIToken").val(localStorage.getItem("API token"));
+  
+        $("#token-localstore-info").show();
+        $("#apikey-form").submit();
+      }
     });
 
 
-    createUI(result["categories"]);
-    storage = result;
-    updateStatus("Ready!");
-    $('#heatmap-btn').prop('disabled', false);
 
-    if (localStorage.getItem("API token")) {
-      $("#APIToken").val(localStorage.getItem("API token"));
-
-      $("#token-localstore-info").show();
-      $("#apikey-form").submit();
-    }
   }).catch(function (error) {
     var source = $("#error-template").html();
     var template = Handlebars.compile(source);
@@ -386,7 +388,10 @@ function updateSingleColor(item, min_val, max_val) {
   } else {
     percentage = (((value - min_val) / (max_val - min_val))) * 100;
     let logpercentage = Math.log(percentage + 1) / Math.log(Math.pow(101,(1/100)));
+<<<<<<< Updated upstream
     console.log(percentage+" => "+logpercentage);
+=======
+>>>>>>> Stashed changes
     item["color"] = {h: (100-logpercentage) * 1.80, s: 100, l: 50};
   }
 
